@@ -57,7 +57,7 @@ public class FileManager
         File dir = new File(this.currPath+File.separator+name);
         if(dir.exists() == false)
         {
-            System.out.println("指定的文件夹不存在。");
+            System.out.println("指定的要删除的文件夹不存在。");
             return false;
         }
         else
