@@ -1,9 +1,10 @@
-package FileManager.src.main.java.jar;
+//package FileManager.src.main.java;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Scanner;
 
 
 public class FileManager
@@ -62,13 +63,34 @@ public class FileManager
         }
         else
         {
-            boolean res = dir.delete();
-            if(res == false)
-            {
-                System.out.println("文件夹删除失败。");
-            }
-            return res;
+            if(dir.isDirectory() == true)
+                galaxyDel(dir);
+            else
+                dir.delete();
+            return true;
         }
+    }
+
+    public void galaxyDel(File f)
+    {
+        File[] all = f.listFiles();
+        if(all == null)
+            return;
+        else
+        {
+            for(File temp : all)
+            {
+                if(temp.isDirectory() == true)
+                {
+                    galaxyDel(temp);
+                }
+                else
+                {
+                    temp.delete();
+                }
+            }
+        }
+        f.delete();
     }
     public int listDir()
     {
@@ -163,10 +185,9 @@ public class FileManager
             }
         }
     }
-    public void encrypt(String ogName) throws IOException
+    public void encrypt(String ogName, byte pw) throws IOException
     {
-        byte pw = 6;
-        File x = new File(ogName);
+        File x = new File(this.currPath+File.separator+ogName);
         if(x.exists() == false)
         {
             System.out.println("请求加密的文件不存在。");
@@ -186,10 +207,13 @@ public class FileManager
             fout.write(buf, 0, count);
         }
         System.out.println("文件"+ogName+"加密成功");
+        fin.close();
+        fout.flush();
+        fout.close();
     }
     public void decrypt(String ogName, byte pw) throws IOException
     {
-        File x = new File(ogName);
+        File x = new File(this.currPath+File.separator+ogName);
         if(x.exists() == false)
         {
             System.out.println("请求解密的文件不存在。");
@@ -209,16 +233,85 @@ public class FileManager
             fout.write(buf, 0, count);
         }
         System.out.println("文件"+ogName+"解密成功");
+        fin.close();
+        fout.flush();
+        fout.close();
     }
-
+    public void wrapper() throws IOException
+    {
+        while(true)
+        {
+            Scanner sc = new Scanner(System.in);
+            System.out.println("ls - 列目录");
+            System.out.println("gt - 前往目录");
+            System.out.println("cd - 新建目录");
+            System.out.println("dd - 删除目录");
+            System.out.println("fc - 拷贝文件");
+            System.out.println("dc - 拷贝目录");
+            System.out.println("ef - 加密文件");
+            System.out.println("df - 解密文件");
+            String choice = sc.nextLine();
+            switch(choice)
+            {
+                case "ls":
+                    this.listDir();
+                    break;
+                case "gt":
+                    System.out.println("请输入目的路径：");
+                    String path = sc.nextLine();
+                    this.goTo(path);
+                    break;
+                case "cd":
+                    System.out.println("请输入文件夹名称：");
+                    String name = sc.nextLine();
+                    this.createDir(name);
+                    break;
+                case "dd":
+                    System.out.println("请输入要删除的文件夹名称：");
+                    String delname = sc.nextLine();
+                    this.deleteDir(delname);
+                    break;
+                case "fc":
+                    System.out.println("请输入要拷贝文件的名称：");
+                    String cname = sc.nextLine();
+                    System.out.println("请输入新文件的名称：");
+                    String cdname = sc.nextLine();
+                    this.fileCopy(cname, cdname);
+                    break;
+                case "dc":
+                    System.out.println("请输入要拷贝文件夹的名称：");
+                    String fname = sc.nextLine();
+                    System.out.println("请输入要拷贝文件夹的目的地：");
+                    String fdpath = sc.nextLine();
+                    System.out.println("请输入新文件夹的名称：");
+                    String fdname = sc.nextLine();
+                    this.folderCopy(fname, fdpath, fdname);
+                    break;
+                case "ef":
+                    System.out.println("请输入要加密文件的名称：");
+                    String ename = sc.nextLine();
+                    System.out.println("请输入要加密文件的密钥：");
+                    byte epw = sc.nextByte();
+                    this.encrypt(ename, epw);
+                    break;
+                case "df":
+                    System.out.println("请输入要解密文件的名称：");
+                    String dename = sc.nextLine();
+                    System.out.println("请输入要解密文件的密钥：");
+                    byte pw = sc.nextByte();
+                    this.decrypt(dename, (byte)pw);
+                    break;
+                default:
+                    System.out.println("指令不存在，请重新输入：");
+                    break;
+            }
+            //sc.close();
+        }
+    }
 
     public static void main(String[] args) throws IOException {
         System.out.println("Hello World!");
         FileManager fm = new FileManager();
-        //fm.goTo("C:\\Users\\surface\\Desktop");
-        //fm.createDir("koko");
-        //fm.fileCopy("og.txt", "dest.txt");
-        //fm.folderCopy("kk", "C:\\Users\\surface\\Desktop", "kjk");
-        fm.decrypt("dest.txt_encryped", (byte)6);
+        fm.wrapper();
     }
 }

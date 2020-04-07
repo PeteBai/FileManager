@@ -184,6 +184,9 @@ public class FileManager
             fout.write(buf, 0, count);
         }
         System.out.println("文件"+ogName+"加密成功");
+        fin.close();
+        fout.flush();
+        fout.close();
     }
     public void decrypt(String ogName, byte pw) throws IOException
     {
@@ -207,6 +210,9 @@ public class FileManager
             fout.write(buf, 0, count);
         }
         System.out.println("文件"+ogName+"解密成功");
+        fin.close();
+        fout.flush();
+        fout.close();
     }
 
 
